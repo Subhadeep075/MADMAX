@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/Subhadeep075/MADMAX/blob/main/README.md
+    about: Check setup and usage docs first.
+  - name: Validation & Production Guide
+    url: https://github.com/Subhadeep075/MADMAX/blob/main/VALIDATION_AND_PRODUCTION_GUIDE.md
+    about: Use this for deployment and production-readiness questions.
+

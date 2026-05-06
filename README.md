@@ -78,3 +78,19 @@ Full-stack workspace for service request operations with customer and admin flow
    - Admin: `cd admin-web && npm run build -- --configuration production`
    - Customer: `cd customer-app && npm run build -- --configuration production`
 6. Validate full flow for 2-3 days on staging before production cutover.
+
+## GitHub Collaboration Setup
+1. Branch protection checklist:
+   - `.github/BRANCH_PROTECTION_CHECKLIST.md`
+2. Issue templates:
+   - `.github/ISSUE_TEMPLATE/bug_report.yml`
+   - `.github/ISSUE_TEMPLATE/feature_request.yml`
+3. Pull request template:
+   - `.github/pull_request_template.md`
+4. CI workflow:
+   - `.github/workflows/ci.yml`
+   - Runs on `push` and `pull_request` to `main`
+   - Checks:
+     - `backend-build`
+     - `admin-web-build`
+     - `customer-app-build`
