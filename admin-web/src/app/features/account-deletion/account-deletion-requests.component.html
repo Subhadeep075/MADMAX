@@ -1,0 +1,83 @@
+<section>
+  <div class="page-header">
+    <div>
+      <h3>Account Deletion Requests</h3>
+      <small class="text-muted">Review and process customer deletion requests.</small>
+    </div>
+    <button class="btn btn-outline-primary btn-sm" (click)="loadRequests()" [disabled]="loading">
+      Refresh
+    </button>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+  <div class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label">Status Filter</label>
+          <select class="form-select" [(ngModel)]="statusFilter" (ngModelChange)="loadRequests()">
+            <option value="">All</option>
+            <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>User Name</th>
+              <th>Mobile</th>
+              <th>Requested Date</th>
+              <th>Status</th>
+              <th>Reason</th>
+              <th>Admin Remarks</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of requests">
+              <td>{{ item.userName }}</td>
+              <td>{{ item.userMobile || '-' }}</td>
+              <td>{{ item.requestedAt | date: 'medium' }}</td>
+              <td>
+                <span class="badge text-bg-light border">{{ item.status }}</span>
+              </td>
+              <td>{{ item.reason || '-' }}</td>
+              <td>{{ item.adminRemarks || '-' }}</td>
+              <td class="text-end">
+                <div *ngIf="canProcess(item)" class="d-flex gap-2 justify-content-end">
+                  <button
+                    class="btn btn-sm btn-success"
+                    [disabled]="activeActionRequestId === item.id"
+                    (click)="approveRequest(item)"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    [disabled]="activeActionRequestId === item.id"
+                    (click)="rejectRequest(item)"
+                  >
+                    Reject
+                  </button>
+                </div>
+                <span *ngIf="!canProcess(item)" class="text-muted">Processed</span>
+              </td>
+            </tr>
+            <tr *ngIf="!loading && requests.length === 0">
+              <td colspan="7" class="text-center text-muted">No deletion requests found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="loading" class="text-muted">Loading account deletion requests...</div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,59 @@
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-title>{{ 'services.title' | t }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [scrollY]="true" class="ion-padding mobile-page with-tabs">
+    <ion-refresher slot="fixed" (ionRefresh)="loadData($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <div class="page-wrapper mobile-container safe-bottom-space">
+      <ion-searchbar
+        [placeholder]="'services.search_placeholder' | t"
+        [value]="searchTerm"
+        (ionInput)="onSearchChange($any($event.target).value)"
+        show-clear-button="always"
+      ></ion-searchbar>
+
+      <ion-item>
+        <ion-label>{{ 'services.filter_by_category' | t }}</ion-label>
+        <ion-select
+          [value]="selectedCategoryId"
+          [placeholder]="'services.all_categories' | t"
+          interface="popover"
+          (ionChange)="onCategoryChange($event.detail.value)"
+        >
+          <ion-select-option [value]="null">{{ 'services.all_categories' | t }}</ion-select-option>
+          <ion-select-option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
+      <div *ngIf="loading" class="text-muted">{{ 'services.loading' | t }}</div>
+
+      <ion-card *ngFor="let service of filteredServices">
+        <ion-card-header>
+          <ion-card-title>{{ service.title }}</ion-card-title>
+          <ion-card-subtitle>{{ service.categoryName }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="service-meta">
+            <ion-badge [color]="statusColor(service.status)">{{ service.status }}</ion-badge>
+            <span>{{ 'home.total' | t }}: ₹{{ service.totalFee }}</span>
+          </div>
+          <p class="line-clamp">{{ service.description }}</p>
+
+          <ion-button expand="block" class="ion-margin-top" (click)="openService(service.id)">{{ 'services.view_details' | t }}</ion-button>
+          <ion-button expand="block" fill="outline" [disabled]="!canApply(service)" (click)="openService(service.id)">
+            {{ canApply(service) ? ('services.apply_now' | t) : ('services.application_closed' | t) }}
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-item lines="none" *ngIf="!loading && filteredServices.length === 0">
+        <ion-label>{{ 'services.no_result' | t }}</ion-label>
+      </ion-item>
+    </div>
+  </ion-content>

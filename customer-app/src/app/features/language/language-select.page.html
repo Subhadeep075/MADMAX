@@ -1,0 +1,34 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>{{ 'app.name' | t }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding mobile-page" [scrollY]="true">
+  <div class="auth-shell language-shell mobile-container page-wrapper">
+    <h2>{{ 'language.choose_title' | t }}</h2>
+    <p class="auth-subtitle">{{ 'language.choose_title_bn' | t }}</p>
+
+    <ion-button
+      expand="block"
+      size="large"
+      [fill]="selectedLanguage === 'en' ? 'solid' : 'outline'"
+      (click)="chooseLanguage('en')"
+    >
+      {{ 'language.english' | t }}
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      size="large"
+      [fill]="selectedLanguage === 'bn' ? 'solid' : 'outline'"
+      (click)="chooseLanguage('bn')"
+    >
+      {{ 'language.bengali' | t }}
+    </ion-button>
+
+    <ion-button expand="block" size="large" color="success" class="ion-margin-top" (click)="continueToAuth()">
+      {{ 'language.continue' | t }}
+    </ion-button>
+  </div>
+</ion-content>

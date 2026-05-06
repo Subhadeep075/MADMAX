@@ -1,0 +1,74 @@
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/login"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'register.title' | t }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [scrollY]="true" class="ion-padding mobile-page">
+    <div class="auth-shell mobile-container page-wrapper">
+      <h2>{{ 'register.heading' | t }}</h2>
+      <p class="auth-subtitle">{{ 'register.subtitle' | t }}</p>
+      <p class="text-muted pin-hint">{{ 'login.pin_hint' | t }}</p>
+
+      <form [formGroup]="registerForm" (ngSubmit)="submit()" class="auth-form">
+        <ion-item>
+          <ion-label position="stacked">{{ 'register.name' | t }}</ion-label>
+          <ion-input formControlName="name" [placeholder]="'register.name' | t"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">{{ 'register.mobile' | t }}</ion-label>
+          <ion-input formControlName="mobile" type="tel" inputmode="numeric" [placeholder]="'login.mobile_placeholder' | t"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">{{ 'register.email' | t }}</ion-label>
+          <ion-input formControlName="email" type="email" [placeholder]="'common.optional' | t"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">{{ 'register.pin' | t }}</ion-label>
+          <ion-input
+            [type]="showPin ? 'number' : 'password'"
+            formControlName="pin"
+            inputmode="numeric"
+            maxlength="4"
+            [placeholder]="'register.pin' | t"
+          ></ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="registerForm.controls.pin.touched && registerForm.controls.pin.invalid">
+          {{ 'register.pin_invalid' | t }}
+        </ion-note>
+
+        <ion-item>
+          <ion-label position="stacked">{{ 'register.confirm_pin' | t }}</ion-label>
+          <ion-input
+            [type]="showPin ? 'number' : 'password'"
+            formControlName="confirmPin"
+            inputmode="numeric"
+            maxlength="4"
+            [placeholder]="'register.confirm_pin' | t"
+          ></ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="registerForm.touched && registerForm.hasError('pinMismatch')">
+          {{ 'register.pin_mismatch' | t }}
+        </ion-note>
+
+        <ion-item>
+          <ion-label position="stacked">{{ 'register.address' | t }}</ion-label>
+          <ion-textarea formControlName="address" autoGrow="true" [placeholder]="'common.optional' | t"></ion-textarea>
+        </ion-item>
+
+        <ion-item lines="none" class="toggle-row">
+          <ion-checkbox slot="start" [checked]="showPin" (ionChange)="showPin = $event.detail.checked"></ion-checkbox>
+          <ion-label>{{ 'register.show_pin' | t }}</ion-label>
+        </ion-item>
+
+        <ion-button type="submit" expand="block" size="large" class="ion-margin-top">{{ 'register.button' | t }}</ion-button>
+        <ion-button fill="clear" expand="block" routerLink="/login">{{ 'register.has_account' | t }}</ion-button>
+      </form>
+    </div>
+  </ion-content>

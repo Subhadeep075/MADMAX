@@ -1,0 +1,81 @@
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-title>{{ 'app.name' | t }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [scrollY]="true" class="ion-padding mobile-page with-tabs">
+    <ion-refresher *ngIf="enablePullToRefresh" slot="fixed" (ionRefresh)="loadData($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <div class="page-wrapper mobile-container safe-bottom-space">
+      <ion-searchbar
+        [placeholder]="'home.search_placeholder' | t"
+        [value]="searchTerm"
+        (ionInput)="searchTerm = $any($event.target).value || ''"
+        show-clear-button="always"
+      ></ion-searchbar>
+
+      <ion-button expand="block" fill="outline" size="large" (click)="goToServices(searchTerm)">
+        {{ 'home.search_all' | t }}
+      </ion-button>
+
+      <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
+      <div *ngIf="loading" class="text-muted">{{ 'home.loading' | t }}</div>
+
+      <section class="section-block assisted-mode-card" *ngIf="centerInfo as center">
+        <h3>{{ 'home.assisted_heading' | t }}</h3>
+        <p><strong>{{ center.centerName }}</strong></p>
+        <p class="text-muted">{{ center.address }}</p>
+        <p><strong>{{ 'home.working_hours' | t }}:</strong> {{ center.workingHours }}</p>
+        <div class="assisted-actions">
+          <ion-button [href]="hasCallContact ? callHref : undefined" [disabled]="!hasCallContact" size="large" color="primary">
+            {{ 'home.call_center' | t }}
+          </ion-button>
+          <ion-button [href]="hasWhatsappContact ? whatsappHref : undefined" [disabled]="!hasWhatsappContact" size="large" color="success">
+            {{ 'home.whatsapp_center' | t }}
+          </ion-button>
+        </div>
+        <p class="text-muted assisted-missing-contact" *ngIf="!hasCallContact || !hasWhatsappContact">
+          {{ 'home.contact_not_available' | t }}
+        </p>
+      </section>
+
+      <section class="section-block">
+        <h3>{{ 'home.categories' | t }}</h3>
+        <div class="category-grid">
+          <ion-card button="true" class="category-card" *ngFor="let category of categories" (click)="goToServices('', category.id)">
+            <ion-card-content>
+              <div class="category-icon">{{ categoryEmoji(category.name) }}</div>
+              <p>{{ category.name }}</p>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <h3>{{ 'home.popular' | t }}</h3>
+        <ion-card *ngFor="let service of popularServices">
+          <ion-card-header>
+            <ion-card-title>{{ service.title }}</ion-card-title>
+            <ion-card-subtitle>{{ service.categoryName }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <p class="line-clamp">{{ service.description }}</p>
+            <div class="service-meta">
+              <ion-badge color="success">{{ 'home.open' | t }}</ion-badge>
+              <span>{{ 'home.total' | t }}: ₹{{ service.totalFee }}</span>
+            </div>
+            <ion-button expand="block" size="large" class="ion-margin-top" (click)="openService(service.id)">
+              {{ 'home.view_apply' | t }}
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-item lines="none" *ngIf="!loading && popularServices.length === 0">
+          <ion-label>{{ 'home.no_open' | t }}</ion-label>
+        </ion-item>
+      </section>
+    </div>
+  </ion-content>

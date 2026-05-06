@@ -1,0 +1,8 @@
+{
+  "name": "digital-cyber-seva-customer-app",
+  "defaultProject": "customer-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

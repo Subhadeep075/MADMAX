@@ -1,0 +1,33 @@
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-title>{{ 'requests.title' | t }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [scrollY]="true" class="ion-padding mobile-page with-tabs">
+    <ion-refresher *ngIf="enablePullToRefresh" slot="fixed" (ionRefresh)="loadRequests($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <div class="page-wrapper mobile-container safe-bottom-space">
+      <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
+      <div *ngIf="loading" class="text-muted">{{ 'requests.loading' | t }}</div>
+
+      <ion-card button="true" *ngFor="let request of requests" (click)="openDetail(request.id)">
+        <ion-card-content>
+          <h3>{{ request.service.title }}</h3>
+          <p><strong>{{ 'requests.tracking_id' | t }}:</strong> {{ request.trackingId }}</p>
+          <p><strong>{{ 'requests.date' | t }}:</strong> {{ request.createdAt | date:'mediumDate' }}</p>
+
+          <div class="service-meta ion-margin-top">
+            <ion-badge [color]="statusColor(request.status)">{{ request.status }}</ion-badge>
+            <ion-badge [color]="paymentColor(request.paymentStatus)">{{ request.paymentStatus }}</ion-badge>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-item lines="none" *ngIf="!loading && requests.length === 0">
+        <ion-label>{{ 'requests.none' | t }}</ion-label>
+      </ion-item>
+    </div>
+  </ion-content>

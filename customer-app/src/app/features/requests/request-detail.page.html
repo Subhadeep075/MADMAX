@@ -1,0 +1,110 @@
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/app/requests"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'request_detail.title' | t }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [scrollY]="true" class="ion-padding mobile-page">
+    <ion-refresher slot="fixed" (ionRefresh)="loadRequest($event)">
+      <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+
+    <div class="page-wrapper mobile-container">
+      <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
+      <div *ngIf="loading" class="text-muted">{{ 'request_detail.loading' | t }}</div>
+
+      <ng-container *ngIf="request as item">
+        <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ item.service.title }}</ion-card-title>
+          <ion-card-subtitle>{{ 'requests.tracking_id' | t }}: {{ item.trackingId }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Status:</strong> {{ item.status }}</p>
+          <p><strong>Payment Status:</strong> {{ item.paymentStatus }}</p>
+          <p><strong>Created:</strong> {{ item.createdAt | date:'medium' }}</p>
+          <p><strong>Remarks:</strong> {{ item.remarks || 'No remarks yet.' }}</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ 'request_detail.status_timeline' | t }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="timeline-list">
+            <div class="timeline-item" *ngFor="let step of timelineSteps" [class.active]="isStepActive(step)">
+              <span class="timeline-dot"></span>
+              <span>{{ step }}</span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ 'request_detail.uploaded_docs' | t }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item *ngFor="let document of item.documents">
+              <ion-label>
+                <h3>{{ document.documentType }}</h3>
+                <p>{{ document.fileName }}</p>
+                <a [href]="document.fileUrl" target="_blank">{{ 'request_detail.open_file' | t }}</a>
+              </ion-label>
+
+              <ion-button
+                *ngIf="!isFinalDocument(document)"
+                color="danger"
+                fill="outline"
+                size="small"
+                [disabled]="deletingDocumentId === document.id"
+                (click)="deleteDocument(document)"
+              >
+                Delete
+              </ion-button>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngIf="finalDocuments.length > 0">
+        <ion-card-header>
+          <ion-card-title>{{ 'request_detail.final_docs' | t }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item *ngFor="let finalDoc of finalDocuments">
+            <ion-label>
+              <h3>{{ finalDoc.fileName }}</h3>
+              <p>{{ finalDoc.uploadedAt | date:'medium' }}</p>
+            </ion-label>
+            <ion-button slot="end" [href]="finalDoc.fileUrl" target="_blank" rel="noopener">
+              {{ 'request_detail.download' | t }}
+            </ion-button>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngIf="item.latestPayment as payment">
+        <ion-card-header>
+          <ion-card-title>{{ 'request_detail.payment_info' | t }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Method:</strong> {{ payment.method }}</p>
+          <p><strong>Status:</strong> {{ payment.status }}</p>
+          <p><strong>UPI ID:</strong> {{ payment.upiTransactionId || '-' }}</p>
+          <p><strong>Date:</strong> {{ payment.createdAt | date:'medium' }}</p>
+          <img *ngIf="payment.paymentProofUrl" [src]="payment.paymentProofUrl" alt="Payment proof" class="doc-preview" />
+        </ion-card-content>
+      </ion-card>
+
+        <ion-button expand="block" size="large" *ngIf="item.paymentStatus !== 'PAID'" (click)="goToPayment()">
+          {{ 'request_detail.submit_or_update_payment' | t }}
+        </ion-button>
+      </ng-container>
+    </div>
+  </ion-content>

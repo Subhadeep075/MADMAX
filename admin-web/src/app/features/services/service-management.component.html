@@ -1,0 +1,154 @@
+    <section>
+      <div class="page-header">
+        <h3>Service Management</h3>
+      </div>
+
+      <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+          <h5 class="card-title">{{ editingServiceId ? 'Edit Service' : 'Add Service' }}</h5>
+          <form [formGroup]="serviceForm" (ngSubmit)="saveService()">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Category</label>
+                <select class="form-select" formControlName="categoryId">
+                  <option [ngValue]="null">Select category</option>
+                  <option *ngFor="let category of categories" [ngValue]="category.id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Service Title</label>
+                <input class="form-control" formControlName="title" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Status</label>
+                <select class="form-select" formControlName="status">
+                  <option *ngFor="let status of serviceStatuses" [value]="status">{{ status }}</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Description</label>
+                <textarea rows="2" class="form-control" formControlName="description"></textarea>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Required Documents (comma separated)</label>
+                <textarea rows="2" class="form-control" formControlName="requiredDocumentsList"></textarea>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Applicant Fields (comma separated)</label>
+                <textarea
+                  rows="2"
+                  class="form-control"
+                  formControlName="applicantFieldsList"
+                  placeholder="Applicant Name, Applicant Mobile, Applicant Email, Applicant Address"
+                ></textarea>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Govt Fee</label>
+                <input type="number" step="0.01" class="form-control" formControlName="govtFee" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Service Fee</label>
+                <input type="number" step="0.01" class="form-control" formControlName="serviceFee" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Open Date</label>
+                <input type="date" class="form-control" formControlName="openDate" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Close Date</label>
+                <input type="date" class="form-control" formControlName="closeDate" />
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+              <button class="btn btn-primary" [disabled]="saving || deleting">
+                {{ editingServiceId ? 'Update Service' : 'Create Service' }}
+              </button>
+              <button type="button" class="btn btn-outline-secondary" [disabled]="saving || deleting" (click)="resetForm()">
+                {{ editingServiceId ? 'Cancel Edit' : 'Reset' }}
+              </button>
+              <button
+                *ngIf="editingServiceId"
+                type="button"
+                class="btn btn-outline-danger"
+                [disabled]="saving || deleting"
+                (click)="deleteEditingService()"
+              >
+                {{ deleting ? 'Deleting...' : 'Delete Service' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="row g-2 align-items-center mb-3">
+            <div class="col-md-5">
+              <input
+                class="form-control"
+                placeholder="Search by service title/category"
+                [(ngModel)]="searchTerm"
+                (ngModelChange)="applyFilters()"
+              />
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" [(ngModel)]="statusFilter" (ngModelChange)="applyFilters()">
+                <option value="">All Status</option>
+                <option *ngFor="let status of serviceStatuses" [value]="status">{{ status }}</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-outline-primary w-100" (click)="loadInitialData()" [disabled]="loading">
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Govt Fee</th>
+                  <th>Service Fee</th>
+                  <th>Open/Close Date</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let service of filteredServices">
+                  <td>
+                    <div class="fw-semibold">{{ service.title }}</div>
+                    <small class="text-muted">{{ service.description }}</small>
+                  </td>
+                  <td>{{ service.categoryName }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="statusClass(service.status)">{{ service.status }}</span>
+                  </td>
+                  <td>{{ service.govtFee | number: '1.2-2' }}</td>
+                  <td>{{ service.serviceFee | number: '1.2-2' }}</td>
+                  <td>
+                    <small>{{ service.openDate || '-' }} / {{ service.closeDate || '-' }}</small>
+                  </td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-primary" (click)="startEdit(service)">Edit</button>
+                  </td>
+                </tr>
+                <tr *ngIf="!loading && filteredServices.length === 0">
+                  <td colspan="7" class="text-center text-muted">No services found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="loading" class="text-muted">Loading services...</div>
+        </div>
+      </div>
+    </section>

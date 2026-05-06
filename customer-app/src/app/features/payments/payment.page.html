@@ -1,0 +1,121 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/app/requests"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'payment.title' | t }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="true" class="ion-padding mobile-page">
+  <ion-refresher slot="fixed" (ionRefresh)="loadData($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-wrapper mobile-container">
+    <div *ngIf="requestTrackingId" class="tracking-chip">{{ 'requests.tracking_id' | t }}: {{ requestTrackingId }}</div>
+
+    <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
+    <div *ngIf="loading" class="text-muted">{{ 'common.loading' | t }}</div>
+
+    <ng-container *ngIf="request as item">
+      <ion-card class="amount-card">
+      <ion-card-header>
+        <ion-card-title>{{ item.service.title }}</ion-card-title>
+        <ion-card-subtitle>{{ 'payment.pay_subtitle' | t }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item>
+            <ion-label>{{ 'service_detail.govt_fee' | t }}</ion-label>
+            <ion-note slot="end">₹{{ item.service.govtFee }}</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label>{{ 'service_detail.service_fee' | t }}</ion-label>
+            <ion-note slot="end">₹{{ item.service.serviceFee }}</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label><strong>{{ 'service_detail.total' | t }}</strong></ion-label>
+            <ion-note slot="end"><strong>₹{{ item.totalAmount }}</strong></ion-note>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+      <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ 'payment.submit_proof' | t }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>{{ 'payment.center_name' | t }}:</strong> {{ paymentSettings?.centerName || centerInfo?.centerName || '-' }}</p>
+        <p><strong>{{ 'payment.official_upi' | t }}:</strong> {{ paymentSettings?.officialUpiId || paymentSettings?.shopUpiId || '-' }}</p>
+        <p><strong>{{ 'payment.last_updated' | t }}:</strong> {{ paymentSettings?.lastUpdatedAt ? (paymentSettings?.lastUpdatedAt | date:'dd-MM-yyyy') : '-' }}</p>
+        <p class="payment-warning">{{ 'payment.warning' | t }}</p>
+
+        <img *ngIf="paymentSettings?.upiQrImageUrl" [src]="paymentSettings?.upiQrImageUrl || ''" alt="UPI QR" class="qr-image" />
+        <p *ngIf="!paymentSettings?.upiQrImageUrl" class="text-muted">{{ 'payment.qr_missing' | t }}</p>
+      </ion-card-content>
+    </ion-card>
+
+      <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ 'payment.submit_proof' | t }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-segment [(ngModel)]="selectedMethod">
+          <ion-segment-button value="UPI_QR">
+            <ion-label>{{ 'payment.upi_method' | t }}</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="CASH">
+            <ion-label>{{ 'payment.cash_method' | t }}</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+
+        <ion-item class="ion-margin-top" *ngIf="selectedMethod === 'UPI_QR'">
+          <ion-label position="stacked">{{ 'payment.upi_txn' | t }}</ion-label>
+          <ion-input [(ngModel)]="upiTransactionId" [placeholder]="'payment.upi_txn_placeholder' | t"></ion-input>
+        </ion-item>
+
+        <label class="file-picker ion-margin-top" *ngIf="selectedMethod === 'UPI_QR'">
+          <input type="file" accept=".jpg,.jpeg,.png,.pdf" (change)="onScreenshotSelected($event)" />
+          <span>{{ 'payment.upload_screenshot' | t }}</span>
+        </label>
+        <p class="text-muted ion-margin-top" *ngIf="selectedMethod === 'UPI_QR' && isBrowser">
+          {{ 'request_form.browser_upload_hint' | t }}
+        </p>
+        <p class="text-muted ion-margin-top" *ngIf="selectedMethod === 'UPI_QR' && isNativeApp">
+          {{ 'request_form.app_upload_hint' | t }}
+        </p>
+
+        <p *ngIf="screenshotFile" class="ion-margin-top"><strong>Selected:</strong> {{ screenshotFile.name }}</p>
+        <img *ngIf="screenshotPreviewUrl" [src]="screenshotPreviewUrl" alt="Screenshot preview" class="doc-preview" />
+
+        <ion-button expand="block" size="large" class="ion-margin-top" [disabled]="submitting" (click)="submitPaymentProof()">
+          {{ lastSubmitFailed ? ('common.retry' | t) : ('payment.submit_proof' | t) }}
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" size="large" [disabled]="submitting" (click)="payAtShop()">
+          {{ 'payment.pay_at_center' | t }}
+        </ion-button>
+      </ion-card-content>
+      </ion-card>
+
+      <section class="section-block assisted-mode-card compact" *ngIf="centerInfo as center">
+      <p class="assisted-title">{{ 'home.assisted_heading' | t }}</p>
+      <p><strong>{{ center.centerName }}</strong></p>
+      <p class="text-muted">{{ center.mobile }}</p>
+      <div class="assisted-actions">
+        <ion-button size="small" [href]="hasCallContact ? callHref : undefined" [disabled]="!hasCallContact">
+          {{ 'home.call_center' | t }}
+        </ion-button>
+        <ion-button size="small" color="success" [href]="hasWhatsappContact ? whatsappHref : undefined" [disabled]="!hasWhatsappContact">
+          {{ 'home.whatsapp_center' | t }}
+        </ion-button>
+      </div>
+      <p class="text-muted assisted-missing-contact" *ngIf="!hasCallContact || !hasWhatsappContact">
+        {{ 'home.contact_not_available' | t }}
+      </p>
+      </section>
+    </ng-container>
+  </div>
+</ion-content>

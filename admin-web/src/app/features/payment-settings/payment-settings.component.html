@@ -1,0 +1,82 @@
+    <section>
+      <div class="page-header">
+        <h3>Admin Payment Settings</h3>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+      <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Upload / Update UPI QR</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Center Name (shown to customer)</label>
+              <input class="form-control" [(ngModel)]="centerName" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Official UPI ID</label>
+              <input class="form-control" [(ngModel)]="officialUpiId" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Center Mobile (for call)</label>
+              <input class="form-control" [(ngModel)]="centerMobile" placeholder="10-digit mobile number" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Center WhatsApp Number</label>
+              <input class="form-control" [(ngModel)]="centerWhatsappNumber" placeholder="10-digit WhatsApp number" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Center Address</label>
+              <input class="form-control" [(ngModel)]="centerAddress" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Center Working Hours</label>
+              <input class="form-control" [(ngModel)]="centerWorkingHours" placeholder="10 AM - 7 PM" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Shop UPI Name (optional)</label>
+              <input class="form-control" [(ngModel)]="shopUpiName" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Shop UPI ID (optional)</label>
+              <input class="form-control" [(ngModel)]="shopUpiId" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">QR Image (jpg/jpeg/png)</label>
+              <input type="file" class="form-control" (change)="onQrFileSelected($event)" />
+            </div>
+          </div>
+          <button class="btn btn-primary mt-3" [disabled]="saving" (click)="uploadQr()">
+            {{ saving ? 'Saving...' : 'Save Payment Settings' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Current Payment Settings</h5>
+            <button class="btn btn-outline-primary btn-sm" (click)="loadSettings()">Refresh</button>
+          </div>
+
+          <p class="mb-1"><strong>UPI Name:</strong> {{ settings?.shopUpiName || '-' }}</p>
+          <p class="mb-2"><strong>UPI ID:</strong> {{ settings?.shopUpiId || '-' }}</p>
+          <p class="mb-1"><strong>Center Name:</strong> {{ settings?.centerName || '-' }}</p>
+          <p class="mb-1"><strong>Center Mobile:</strong> {{ settings?.centerMobile || '-' }}</p>
+          <p class="mb-1"><strong>Center WhatsApp:</strong> {{ settings?.centerWhatsappNumber || '-' }}</p>
+          <p class="mb-1"><strong>Center Address:</strong> {{ settings?.centerAddress || '-' }}</p>
+          <p class="mb-1"><strong>Center Working Hours:</strong> {{ settings?.centerWorkingHours || '-' }}</p>
+          <p class="mb-1"><strong>Official UPI:</strong> {{ settings?.officialUpiId || '-' }}</p>
+          <p class="mb-2"><strong>Last Updated:</strong> {{ settings?.lastUpdatedAt ? (settings?.lastUpdatedAt | date:'dd-MM-yyyy HH:mm') : '-' }}</p>
+
+          <div *ngIf="settings?.upiQrImageUrl as qrUrl; else noQr">
+            <img [src]="qrUrl" alt="UPI QR" class="qr-preview mb-2" />
+            <div><a [href]="qrUrl" target="_blank" class="btn btn-outline-secondary btn-sm">Open Full Image</a></div>
+          </div>
+          <ng-template #noQr>
+            <p class="text-muted mb-0">No QR image uploaded yet.</p>
+          </ng-template>
+        </div>
+      </div>
+    </section>

@@ -1,0 +1,71 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>{{ 'login.title' | t }}</ion-title>
+    <ion-buttons slot="end" class="toolbar-lang-switch">
+      <ion-button
+        size="small"
+        [fill]="selectedLanguage === 'en' ? 'solid' : 'outline'"
+        (click)="changeLanguage('en')"
+      >
+        EN
+      </ion-button>
+      <ion-button
+        size="small"
+        [fill]="selectedLanguage === 'bn' ? 'solid' : 'outline'"
+        (click)="changeLanguage('bn')"
+      >
+        বাংলা
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="true" class="ion-padding mobile-page login-center-page">
+  <div class="auth-shell mobile-container page-wrapper login-centered-shell">
+    <h2>{{ 'app.name' | t }}</h2>
+    <p class="auth-subtitle">{{ 'login.subtitle' | t }}</p>
+    <p class="text-muted pin-hint">{{ 'login.pin_hint' | t }}</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="submit()" class="auth-form">
+      <ion-item lines="full">
+        <ion-label position="stacked">{{ 'login.mobile' | t }}</ion-label>
+        <ion-input
+          formControlName="mobile"
+          type="tel"
+          inputmode="numeric"
+          [placeholder]="'login.mobile_placeholder' | t"
+        ></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="loginForm.controls.mobile.touched && loginForm.controls.mobile.invalid">
+        {{ 'login.mobile_invalid' | t }}
+      </ion-note>
+
+      <ion-item lines="full">
+        <ion-label position="stacked">{{ 'login.pin_label' | t }}</ion-label>
+        <ion-input
+          [type]="showPin ? 'number' : 'password'"
+          formControlName="pin"
+          inputmode="numeric"
+          maxlength="4"
+          [placeholder]="'login.pin_placeholder' | t"
+        ></ion-input>
+      </ion-item>
+      <ion-note color="danger" *ngIf="loginForm.controls.pin.touched && loginForm.controls.pin.invalid">
+        {{ 'login.pin_invalid' | t }}
+      </ion-note>
+
+      <ion-item lines="none" class="toggle-row">
+        <ion-checkbox slot="start" [checked]="showPin" (ionChange)="showPin = $event.detail.checked"></ion-checkbox>
+        <ion-label>{{ 'login.show_pin' | t }}</ion-label>
+      </ion-item>
+
+      <ion-item lines="none" class="toggle-row">
+        <ion-checkbox slot="start" formControlName="rememberMobile"></ion-checkbox>
+        <ion-label>{{ 'login.remember_mobile' | t }}</ion-label>
+      </ion-item>
+
+      <ion-button type="submit" expand="block" size="large" class="ion-margin-top">{{ 'login.button' | t }}</ion-button>
+      <ion-button fill="outline" expand="block" size="large" routerLink="/register">{{ 'login.register_button' | t }}</ion-button>
+    </form>
+  </div>
+</ion-content>

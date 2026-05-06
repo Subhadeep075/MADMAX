@@ -1,0 +1,73 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="'/request-form/' + serviceId"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'review.title' | t }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="true" class="ion-padding mobile-page">
+  <div class="page-wrapper mobile-container">
+  <div class="step-indicator">{{ 'review.step3' | t }}</div>
+  <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
+
+  <ng-container *ngIf="draft as item">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ item.serviceTitle }}</ion-card-title>
+        <ion-card-subtitle>{{ 'review.total_amount' | t }}: ₹{{ item.totalAmount }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>{{ 'review.govt_fee' | t }}:</strong> ₹{{ item.govtFee }}</p>
+        <p><strong>{{ 'review.service_fee' | t }}:</strong> ₹{{ item.serviceFee }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ 'review.applicant_details' | t }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p *ngFor="let entry of item.applicantDetails.entries">
+          <strong>{{ entry.label }}:</strong> {{ entry.value || '-' }}
+        </p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ 'review.uploaded_documents' | t }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let document of item.documents">
+            <ion-label>
+              <h3>{{ document.documentType }}</h3>
+              <p>{{ document.fileName }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card *ngIf="failedDocuments.length > 0" color="warning">
+      <ion-card-header>
+        <ion-card-title>{{ 'review.upload_retry_failed' | t }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let document of failedDocuments">
+            <ion-label>{{ document.documentType }} - {{ document.fileName }}</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-button expand="block" fill="outline" size="large" (click)="editRequestForm()">{{ 'review.edit_request' | t }}</ion-button>
+    <ion-button expand="block" size="large" class="ion-margin-top" [disabled]="submitting" (click)="submitRequest()">
+      {{ failedDocuments.length > 0 ? ('review.retry_failed_uploads' | t) : ('review.submit_request' | t) }}
+    </ion-button>
+  </ng-container>
+  </div>
+</ion-content>

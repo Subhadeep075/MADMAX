@@ -1,0 +1,146 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/app/services"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'request_form.title' | t }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="true" class="ion-padding mobile-page">
+  <div class="page-wrapper mobile-container">
+    <div class="step-indicator">{{ 'request_form.step2' | t }}</div>
+    <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
+    <div *ngIf="loading" class="text-muted">{{ 'request_form.loading' | t }}</div>
+
+    <ng-container *ngIf="service as item">
+      <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ item.title }}</ion-card-title>
+        <ion-card-subtitle>{{ 'home.total' | t }}: ₹{{ item.totalFee }}</ion-card-subtitle>
+      </ion-card-header>
+    </ion-card>
+
+      <form [formGroup]="applicantForm" class="form-grid">
+      <ion-item *ngFor="let field of primaryApplicantFields">
+        <ion-label position="stacked">
+          {{ field.label }}
+          <span *ngIf="field.required">*</span>
+        </ion-label>
+
+        <ion-textarea
+          *ngIf="field.type === 'textarea'; else primarySimpleInput"
+          [formControlName]="field.key"
+          autoGrow="true"
+          [placeholder]="'request_form.enter' | t : { field: (field.label | lowercase) }"
+        ></ion-textarea>
+
+        <ng-template #primarySimpleInput>
+          <ion-input
+            [formControlName]="field.key"
+            [type]="field.type"
+            [inputmode]="field.type === 'tel' ? 'numeric' : 'text'"
+            [placeholder]="'request_form.enter' | t : { field: (field.label | lowercase) }"
+          ></ion-input>
+        </ng-template>
+      </ion-item>
+
+      <details class="more-details" *ngIf="optionalApplicantFields.length > 0">
+        <summary>{{ 'request_form.more_details' | t }}</summary>
+        <div class="form-grid details-grid">
+          <ion-item *ngFor="let field of optionalApplicantFields">
+            <ion-label position="stacked">{{ field.label }}</ion-label>
+
+            <ion-textarea
+              *ngIf="field.type === 'textarea'; else optionalSimpleInput"
+              [formControlName]="field.key"
+              autoGrow="true"
+              [placeholder]="'request_form.enter' | t : { field: (field.label | lowercase) }"
+            ></ion-textarea>
+
+            <ng-template #optionalSimpleInput>
+              <ion-input
+                [formControlName]="field.key"
+                [type]="field.type"
+                [inputmode]="field.type === 'tel' ? 'numeric' : 'text'"
+                [placeholder]="'request_form.enter' | t : { field: (field.label | lowercase) }"
+              ></ion-input>
+            </ng-template>
+          </ion-item>
+        </div>
+      </details>
+      </form>
+
+      <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ 'request_form.required_docs' | t }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="document-checklist">
+          <div class="document-check-item" *ngFor="let documentType of requiredDocuments">
+            <div class="document-check-head">
+              <h4>{{ documentType }}</h4>
+              <ion-badge [color]="documentStatus(documentType) === 'UPLOADED' ? 'success' : 'warning'">
+                {{ documentStatus(documentType) === 'UPLOADED' ? ('request_form.status_uploaded' | t) : ('request_form.status_missing' | t) }}
+              </ion-badge>
+            </div>
+
+            <div class="document-check-actions" *ngIf="getDocumentForType(documentType) as doc; else missingDocActions">
+              <ion-button size="small" fill="outline" (click)="openDocument(doc)">
+                {{ 'common.view' | t }}
+              </ion-button>
+              <ion-button size="small" color="danger" fill="outline" (click)="removeDraftDocument(doc)">
+                {{ 'common.delete' | t }}
+              </ion-button>
+            </div>
+            <ng-template #missingDocActions>
+              <label class="file-picker">
+                <input type="file" accept=".jpg,.jpeg,.png,.pdf" (change)="onRequiredDocumentSelected(documentType, $event)" />
+                <span>{{ 'common.upload' | t }}</span>
+              </label>
+            </ng-template>
+          </div>
+        </div>
+
+        <p *ngIf="requiredDocuments.length === 0" class="text-muted">{{ 'request_form.no_required_docs' | t }}</p>
+
+        <details class="more-details">
+          <summary>{{ 'request_form.more_details' | t }}</summary>
+          <ion-item>
+            <ion-label position="stacked">Document Type</ion-label>
+            <ion-input [(ngModel)]="optionalDocumentType" [ngModelOptions]="{ standalone: true }" placeholder="Aadhaar / Photo / PAN"></ion-input>
+          </ion-item>
+          <label class="file-picker ion-margin-top">
+            <input type="file" accept=".jpg,.jpeg,.png,.pdf" (change)="onOptionalDocumentSelected($event)" />
+            <span>{{ 'request_form.select_file' | t }}</span>
+          </label>
+        </details>
+
+        <p class="text-muted ion-margin-top" *ngIf="isBrowser">{{ 'request_form.browser_upload_hint' | t }}</p>
+        <p class="text-muted ion-margin-top" *ngIf="isNativeApp">{{ 'request_form.app_upload_hint' | t }}</p>
+      </ion-card-content>
+      </ion-card>
+
+      <section class="section-block assisted-mode-card compact" *ngIf="centerInfo as center">
+      <p class="assisted-title">{{ 'home.assisted_heading' | t }}</p>
+      <p><strong>{{ center.centerName }}</strong></p>
+      <p class="text-muted">{{ center.mobile }}</p>
+      <div class="assisted-actions">
+        <ion-button size="small" [href]="hasCallContact ? callHref : undefined" [disabled]="!hasCallContact">
+          {{ 'home.call_center' | t }}
+        </ion-button>
+        <ion-button size="small" color="success" [href]="hasWhatsappContact ? whatsappHref : undefined" [disabled]="!hasWhatsappContact">
+          {{ 'home.whatsapp_center' | t }}
+        </ion-button>
+      </div>
+      <p class="text-muted assisted-missing-contact" *ngIf="!hasCallContact || !hasWhatsappContact">
+        {{ 'home.contact_not_available' | t }}
+      </p>
+      </section>
+
+      <ion-button expand="block" size="large" class="ion-margin-top" (click)="continueToReview()">
+        {{ 'request_form.review_submit' | t }}
+      </ion-button>
+    </ng-container>
+  </div>
+</ion-content>

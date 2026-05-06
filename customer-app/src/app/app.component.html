@@ -1,0 +1,22 @@
+<ion-app [class.browser-app-shell]="isBrowser">
+  <ion-router-outlet></ion-router-outlet>
+
+  <ion-button
+    *ngIf="showCustomerNotificationIcon"
+    class="customer-notification-fab"
+    fill="clear"
+    size="default"
+    [attr.aria-label]="unreadNotificationLabel"
+    [title]="unreadNotificationLabel"
+    (click)="openNotifications()"
+  >
+    <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+    <ion-badge
+      *ngIf="unreadNotificationCount > 0"
+      color="danger"
+      class="customer-notification-badge"
+    >
+      {{ displayUnreadCount }}
+    </ion-badge>
+  </ion-button>
+</ion-app>

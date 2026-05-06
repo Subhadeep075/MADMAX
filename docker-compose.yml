@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: dcs-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: digital_cyber_seva
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - '3306:3306'
+    volumes:
+      - dcs_mysql_data:/var/lib/mysql
+
+volumes:
+  dcs_mysql_data:

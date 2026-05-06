@@ -1,0 +1,73 @@
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/app/services"></ion-back-button>
+      </ion-buttons>
+      <ion-title>{{ 'service_detail.title' | t }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content [scrollY]="true" class="ion-padding mobile-page">
+    <div class="page-wrapper mobile-container">
+      <div class="step-indicator">{{ 'service_detail.step1' | t }}</div>
+      <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
+      <div *ngIf="loading" class="text-muted">{{ 'common.loading' | t }}</div>
+
+      <ng-container *ngIf="service as item">
+        <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ item.title }}</ion-card-title>
+          <ion-card-subtitle>{{ item.categoryName }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="service-meta ion-margin-bottom">
+            <ion-badge [color]="item.status === 'OPEN' ? 'success' : item.status === 'COMING_SOON' ? 'warning' : 'medium'">
+              {{ item.status }}
+            </ion-badge>
+          </div>
+
+          <p>{{ item.description }}</p>
+
+          <ion-list lines="none" class="ion-margin-top">
+            <ion-item>
+              <ion-label><strong>{{ 'service_detail.total' | t }}</strong></ion-label>
+              <ion-note slot="end"><strong>₹{{ item.totalFee }}</strong></ion-note>
+            </ion-item>
+            <ion-item>
+              <ion-label>{{ 'service_detail.govt_fee' | t }}</ion-label>
+              <ion-note slot="end">₹{{ item.govtFee }}</ion-note>
+            </ion-item>
+            <ion-item>
+              <ion-label>{{ 'service_detail.service_fee' | t }}</ion-label>
+              <ion-note slot="end">₹{{ item.serviceFee }}</ion-note>
+            </ion-item>
+          </ion-list>
+
+          <h4>{{ 'service_detail.required_docs' | t }}</h4>
+          <ion-list *ngIf="requiredDocuments.length > 0">
+            <ion-item *ngFor="let document of requiredDocuments">{{ document }}</ion-item>
+          </ion-list>
+          <p *ngIf="requiredDocuments.length === 0" class="text-muted">{{ 'service_detail.no_required_docs' | t }}</p>
+
+          <details class="more-details">
+            <summary>{{ 'common.more_details' | t }}</summary>
+            <ion-list lines="none" class="ion-margin-top">
+              <ion-item>
+                <ion-label>{{ 'service_detail.open_date' | t }}</ion-label>
+                <ion-note slot="end">{{ item.openDate || ('service_detail.not_specified' | t) }}</ion-note>
+              </ion-item>
+              <ion-item>
+                <ion-label>{{ 'service_detail.close_date' | t }}</ion-label>
+                <ion-note slot="end">{{ item.closeDate || ('service_detail.not_specified' | t) }}</ion-note>
+              </ion-item>
+            </ion-list>
+          </details>
+
+          <ion-button expand="block" size="large" class="ion-margin-top" [disabled]="!canApply()" (click)="applyNow()">
+            {{ canApply() ? ('services.apply_now' | t) : ('service_detail.apply_disabled' | t) }}
+          </ion-button>
+        </ion-card-content>
+        </ion-card>
+      </ng-container>
+    </div>
+  </ion-content>

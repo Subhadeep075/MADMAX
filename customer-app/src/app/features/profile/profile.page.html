@@ -1,0 +1,138 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>{{ 'profile.title' | t }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="true" class="ion-padding mobile-page with-tabs">
+  <div class="page-wrapper mobile-container safe-bottom-space">
+  <ion-card>
+    <ion-card-header>
+      <div class="profile-title-row" *ngIf="!editingName">
+        <ion-card-title>{{ name }}</ion-card-title>
+        <ion-button fill="clear" size="small" (click)="startNameEdit()" [disabled]="loadingProfile || savingName">
+          {{ 'profile.edit_name' | t }}
+        </ion-button>
+      </div>
+
+      <div class="profile-name-edit-row" *ngIf="editingName">
+        <ion-item lines="none">
+          <ion-input
+            [label]="'profile.name' | t"
+            labelPlacement="stacked"
+            [value]="nameDraft"
+            maxlength="80"
+            (ionInput)="nameDraft = $any($event.target).value ?? ''"
+          ></ion-input>
+        </ion-item>
+        <div class="profile-edit-actions">
+          <ion-button size="small" (click)="saveName()" [disabled]="savingName">
+            <ion-spinner slot="start" name="crescent" *ngIf="savingName"></ion-spinner>
+            {{ 'common.save' | t }}
+          </ion-button>
+          <ion-button size="small" fill="outline" color="medium" (click)="cancelNameEdit()" [disabled]="savingName">
+            {{ 'common.cancel' | t }}
+          </ion-button>
+        </div>
+      </div>
+
+      <ion-card-subtitle>{{ identifier }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list lines="none" class="profile-detail-list">
+        <ion-item>
+          <ion-label>
+            <p class="text-muted">{{ 'profile.mobile' | t }}</p>
+            <h3>{{ mobile }}</h3>
+          </ion-label>
+        </ion-item>
+        <ion-item *ngIf="email">
+          <ion-label>
+            <p class="text-muted">{{ 'profile.email' | t }} ({{ 'common.optional' | t }})</p>
+            <h3>{{ email }}</h3>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label>
+            <p class="text-muted">{{ 'profile.address' | t }}</p>
+            <h3>{{ address }}</h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ 'profile.language' | t }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="language-switch-row">
+        <ion-button [fill]="selectedLanguage === 'en' ? 'solid' : 'outline'" size="small" (click)="changeLanguage('en')">
+          {{ 'language.english' | t }}
+        </ion-button>
+        <ion-button [fill]="selectedLanguage === 'bn' ? 'solid' : 'outline'" size="small" (click)="changeLanguage('bn')">
+          {{ 'language.bengali' | t }}
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ 'profile.updates' | t }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div *ngIf="loadingNotifications" class="text-muted">{{ 'common.loading' | t }}</div>
+      <ion-list lines="none" *ngIf="!loadingNotifications && notifications.length > 0">
+        <ion-item *ngFor="let notification of notifications">
+          <ion-label>
+            <p>{{ notification.message }}</p>
+            <p class="text-muted">{{ notification.createdAt | date:'dd MMM yyyy, h:mm a' }}</p>
+          </ion-label>
+          <ion-button
+            slot="end"
+            size="small"
+            fill="outline"
+            *ngIf="!notification.read"
+            (click)="markNotificationRead(notification.id)"
+          >
+            {{ 'profile.mark_read' | t }}
+          </ion-button>
+        </ion-item>
+      </ion-list>
+      <p class="text-muted" *ngIf="!loadingNotifications && notifications.length === 0">
+        {{ 'profile.no_notifications' | t }}
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ 'profile.account_deletion' | t }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="deletion-status-row">
+        <span class="text-muted">{{ 'common.status' | t }}</span>
+        <span class="status-pill" [ngClass]="'status-' + deletionStatus.toLowerCase()">{{ deletionStatus }}</span>
+      </div>
+      <p class="text-muted">{{ statusDescription }}</p>
+
+      <ion-button
+        expand="block"
+        color="warning"
+        size="large"
+        [disabled]="!canRequestDeletion || loadingDeletionStatus"
+        (click)="requestAccountDeletion()"
+      >
+        {{ 'profile.delete_request' | t }}
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" fill="outline" size="large" (click)="openMyRequests()">
+    {{ 'profile.my_requests' | t }}
+  </ion-button>
+  <ion-button expand="block" size="large" color="danger" (click)="logout()">{{ 'profile.logout' | t }}</ion-button>
+  </div>
+</ion-content>

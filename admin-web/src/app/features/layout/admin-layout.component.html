@@ -1,0 +1,77 @@
+    <div class="admin-shell">
+      <aside class="sidebar">
+        <div class="brand-block">
+          <h4>Digital Cyber Seva</h4>
+          <p>Admin Panel</p>
+        </div>
+
+        <nav class="nav-links">
+          <a
+            *ngFor="let item of navItems"
+            class="nav-link"
+            [routerLink]="item.link"
+            routerLinkActive="active-link"
+          >
+            <span class="nav-link-content">
+              <span>{{ item.label }}</span>
+              <span *ngIf="getBadgeCount(item) as badgeCount" class="nav-count-badge">{{ badgeCount }}</span>
+            </span>
+          </a>
+        </nav>
+      </aside>
+
+      <div class="content-shell">
+        <header class="topbar">
+          <div>
+            <h5 class="title">Welcome, {{ authService.getName() || 'Admin' }}</h5>
+            <small class="subtitle">Manage services, requests, and payments.</small>
+          </div>
+          <div class="topbar-actions">
+            <button
+              type="button"
+              class="top-icon-button"
+              [class.has-alert]="hasRequestNotifications"
+              [attr.aria-label]="requestNotificationLabel"
+              [title]="requestNotificationLabel"
+              (click)="toggleNotificationPanel()"
+            >
+              <span class="top-icon-bell" aria-hidden="true">🔔</span>
+              <span *ngIf="hasRequestNotifications" class="top-icon-count">{{ requestNotificationCount }}</span>
+            </button>
+
+            <div class="admin-notification-backdrop" *ngIf="showNotificationPanel" (click)="closeNotificationPanel()"></div>
+            <div class="admin-notification-panel" *ngIf="showNotificationPanel" (click)="$event.stopPropagation()">
+              <div class="admin-notification-header">Notifications</div>
+
+              <button type="button" class="admin-notification-item" *ngIf="pendingRequestAlerts > 0" (click)="openPendingRequestNotifications()">
+                <div class="admin-notification-title">New pending requests</div>
+                <div class="admin-notification-subtitle">{{ pendingRequestAlerts }} waiting in Request Queue</div>
+              </button>
+
+              <button type="button" class="admin-notification-item" *ngIf="pendingPaymentProofAlerts > 0" (click)="openPaymentProofNotifications()">
+                <div class="admin-notification-title">Payment proof submitted</div>
+                <div class="admin-notification-subtitle">{{ pendingPaymentProofAlerts }} waiting for verification</div>
+              </button>
+
+              <button
+                type="button"
+                class="admin-notification-item admin-notification-item-empty"
+                *ngIf="!hasRequestNotifications"
+                (click)="closeNotificationPanel()"
+              >
+                <div class="admin-notification-subtitle">No new request alerts right now.</div>
+              </button>
+            </div>
+
+            <span *ngIf="pendingDeletionCount > 0" class="top-alert-pill">
+              Pending deletions: {{ pendingDeletionCount }}
+            </span>
+            <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Logout</button>
+          </div>
+        </header>
+
+        <main class="content-area">
+          <router-outlet></router-outlet>
+        </main>
+      </div>
+    </div>

@@ -1,0 +1,38 @@
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/app/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ 'notifications.title' | t }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="true" class="ion-padding mobile-page with-tabs">
+  <ion-refresher *ngIf="enablePullToRefresh" slot="fixed" (ionRefresh)="loadNotifications($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-wrapper mobile-container safe-bottom-space">
+    <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
+    <div *ngIf="loading" class="text-muted">{{ 'notifications.loading' | t }}</div>
+
+    <ion-list lines="full" *ngIf="!loading && notifications.length > 0">
+      <ion-item
+        button="true"
+        detail="true"
+        *ngFor="let notification of notifications"
+        (click)="openNotification(notification)"
+      >
+        <ion-label>
+          <h3>{{ notification.message }}</h3>
+          <p class="text-muted">{{ notification.createdAt | date:'dd MMM yyyy, h:mm a' }}</p>
+        </ion-label>
+        <ion-note slot="end" color="primary" *ngIf="!notification.read">{{ 'notifications.new' | t }}</ion-note>
+      </ion-item>
+    </ion-list>
+
+    <ion-item lines="none" *ngIf="!loading && notifications.length === 0">
+      <ion-label class="text-muted">{{ 'notifications.empty' | t }}</ion-label>
+    </ion-item>
+  </div>
+</ion-content>

@@ -1,0 +1,686 @@
+{
+  "info": {
+    "name": "Digital Cyber Seva API",
+    "description": "Postman collection for Digital Cyber Seva backend APIs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ravi Kumar\",\n  \"mobile\": \"9876543210\",\n  \"email\": \"ravi@example.com\",\n  \"pin\": \"1234\",\n  \"address\": \"Patna\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.token) { pm.collectionVariables.set('customerToken', data.token); }",
+                  "if (data.userId) { pm.collectionVariables.set('customerUserId', data.userId); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile\": \"9876543210\",\n  \"pin\": \"1234\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Set PIN For Existing Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile\": \"9876543210\",\n  \"oldPassword\": \"Ravi@123\",\n  \"pin\": \"1234\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/set-pin"
+          }
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.token) { pm.collectionVariables.set('adminToken', data.token); }",
+                  "if (data.userId) { pm.collectionVariables.set('adminUserId', data.userId); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin@digitalcyberseva.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public-Customer",
+      "item": [
+        {
+          "name": "List Services",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/services"
+          }
+        },
+        {
+          "name": "Get Service By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/services/{{serviceId}}"
+          }
+        },
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/categories"
+          }
+        },
+        {
+          "name": "Get Payment Settings",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/payment-settings"
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/customer/profile"
+          }
+        },
+        {
+          "name": "Update My Name",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ravi Kumar Updated\"\n}"
+            },
+            "url": "{{baseUrl}}/api/customer/profile/name"
+          }
+        },
+        {
+          "name": "Create Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceId\": {{serviceId}},\n  \"remarks\": \"Please process soon\"\n}"
+            },
+            "url": "{{baseUrl}}/api/requests"
+          }
+        },
+        {
+          "name": "Get My Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/requests/my"
+          }
+        },
+        {
+          "name": "Get My Request By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/requests/{{requestId}}"
+          }
+        },
+        {
+          "name": "Upload Request Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "documentType",
+                  "value": "AADHAAR",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/requests/{{requestId}}/documents"
+          }
+        },
+        {
+          "name": "Delete Request Document (Customer)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/requests/{{requestId}}/documents/{{documentId}}"
+          }
+        },
+        {
+          "name": "Submit Payment Proof",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "method",
+                  "value": "UPI_QR",
+                  "type": "text"
+                },
+                {
+                  "key": "upiTransactionId",
+                  "value": "UPI123456789",
+                  "type": "text"
+                },
+                {
+                  "key": "paymentProofFile",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "screenshot",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/requests/{{requestId}}/payment-proof"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/dashboard"
+          }
+        },
+        {
+          "name": "Upload/Update UPI QR",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "qrImage",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "shopUpiName",
+                  "value": "Digital Cyber Seva Main",
+                  "type": "text"
+                },
+                {
+                  "key": "shopUpiId",
+                  "value": "shop@upi",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/admin/payment-settings/upi-qr"
+          }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Licenses\",\n  \"iconName\": \"card-outline\",\n  \"displayOrder\": 4,\n  \"active\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/categories"
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Licenses Updated\",\n  \"iconName\": \"card-outline\",\n  \"displayOrder\": 4,\n  \"active\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/categories/{{categoryId}}"
+          }
+        },
+        {
+          "name": "Create Service",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": {{categoryId}},\n  \"title\": \"Birth Certificate\",\n  \"description\": \"Apply for birth certificate\",\n  \"requiredDocumentsJson\": \"[\\\"Hospital Slip\\\",\\\"Parent Aadhaar\\\"]\",\n  \"govtFee\": 35.00,\n  \"serviceFee\": 65.00,\n  \"status\": \"OPEN\",\n  \"openDate\": \"2026-04-28\",\n  \"closeDate\": null\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/services"
+          }
+        },
+        {
+          "name": "Update Service",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": {{categoryId}},\n  \"title\": \"Birth Certificate Updated\",\n  \"description\": \"Updated description\",\n  \"requiredDocumentsJson\": \"[\\\"Hospital Slip\\\",\\\"Parent Aadhaar\\\"]\",\n  \"govtFee\": 35.00,\n  \"serviceFee\": 75.00,\n  \"status\": \"OPEN\",\n  \"openDate\": \"2026-04-28\",\n  \"closeDate\": null\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/services/{{serviceId}}"
+          }
+        },
+        {
+          "name": "List All Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/requests"
+          }
+        },
+        {
+          "name": "Get Request By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/requests/{{requestId}}"
+          }
+        },
+        {
+          "name": "Update Request Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"remarks\": \"Documents verified\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/requests/{{requestId}}/status"
+          }
+        },
+        {
+          "name": "Upload Final Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/admin/requests/{{requestId}}/final-document"
+          }
+        },
+        {
+          "name": "Verify Payment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PAID\",\n  \"remarks\": \"UPI proof verified\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/requests/{{requestId}}/payment/verify"
+          }
+        },
+        {
+          "name": "Delete Request Document (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/requests/{{requestId}}/documents/{{documentId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Account Deletion",
+      "item": [
+        {
+          "name": "Request Account Deletion (Customer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \"reason\": \"I no longer need this account\"\\n}"
+            },
+            "url": "{{baseUrl}}/api/account-deletion/request"
+          }
+        },
+        {
+          "name": "Get My Deletion Status (Customer)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/account-deletion/status"
+          }
+        },
+        {
+          "name": "List Account Deletion Requests (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (Array.isArray(data) && data.length) {",
+                  "  const pending = data.find((x) => x.status === \"PENDING\");",
+                  "  const target = pending || data[0];",
+                  "  if (target && target.id) {",
+                  "    pm.collectionVariables.set(\"deletionRequestId\", target.id);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/account-deletion"
+          }
+        },
+        {
+          "name": "Approve Account Deletion Request (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \"remarks\": \"Approved after verification\"\\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/account-deletion/{{deletionRequestId}}/approve"
+          }
+        },
+        {
+          "name": "Reject Account Deletion Request (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\\n  \"remarks\": \"Rejected due to compliance review\"\\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/account-deletion/{{deletionRequestId}}/reject"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "customerToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "serviceId",
+      "value": "1"
+    },
+    {
+      "key": "categoryId",
+      "value": "1"
+    },
+    {
+      "key": "requestId",
+      "value": "1"
+    },
+    {
+      "key": "documentId",
+      "value": "1"
+    },
+    {
+      "key": "deletionRequestId",
+      "value": "1"
+    }
+  ]
+}

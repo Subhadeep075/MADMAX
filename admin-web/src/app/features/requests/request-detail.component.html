@@ -1,0 +1,160 @@
+    <section>
+      <div class="page-header">
+        <div>
+          <h3>Request Detail</h3>
+          <small class="text-muted">Tracking ID: {{ request?.trackingId || '-' }}</small>
+        </div>
+        <a class="btn btn-outline-secondary btn-sm" routerLink="/requests">Back to Queue</a>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+      <div *ngIf="loading" class="text-muted">Loading request detail...</div>
+
+      <ng-container *ngIf="request as item">
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h5>Customer Details</h5>
+                <p class="mb-1"><strong>Name:</strong> {{ item.customerName }}</p>
+                <p class="mb-1"><strong>Customer ID:</strong> {{ item.customerId }}</p>
+                <p class="mb-1"><strong>Created:</strong> {{ item.createdAt | date: 'medium' }}</p>
+                <p class="mb-0"><strong>Updated:</strong> {{ item.updatedAt | date: 'medium' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h5>Service Details</h5>
+                <p class="mb-1"><strong>Service:</strong> {{ item.service.title }}</p>
+                <p class="mb-1"><strong>Category:</strong> {{ item.service.categoryName }}</p>
+                <p class="mb-1"><strong>Total Amount:</strong> {{ item.totalAmount | number: '1.2-2' }}</p>
+                <p class="mb-0"><strong>Status:</strong> {{ item.status }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card shadow-sm border-0">
+              <div class="card-body">
+                <h5>Submitted Form Data</h5>
+                <p class="mb-1"><strong>Remarks:</strong> {{ item.remarks || '-' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card shadow-sm border-0">
+              <div class="card-body">
+                <h5>Uploaded Documents</h5>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th>File Name</th>
+                        <th>Uploaded</th>
+                        <th class="text-end">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let document of item.documents">
+                        <td>{{ document.documentType }}</td>
+                        <td>{{ document.fileName }}</td>
+                        <td>{{ document.uploadedAt | date: 'medium' }}</td>
+                        <td class="text-end">
+                          <a class="btn btn-sm btn-outline-primary me-2" [href]="document.fileUrl" target="_blank">
+                            Preview
+                          </a>
+                          <button class="btn btn-sm btn-outline-danger" (click)="openDeleteConfirmation(document)">
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                      <tr *ngIf="item.documents.length === 0">
+                        <td colspan="4" class="text-center text-muted">No documents uploaded yet.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card shadow-sm border-0">
+              <div class="card-body">
+                <h5>Payment Proof</h5>
+                <p class="mb-1">
+                  <strong>Payment Status:</strong>
+                  <span class="badge" [ngClass]="paymentStatusBadge(item.paymentStatus)">{{ item.paymentStatus }}</span>
+                </p>
+                <p class="mb-1"><strong>UPI Transaction ID:</strong> {{ item.latestPayment?.upiTransactionId || '-' }}</p>
+                <div *ngIf="item.latestPayment?.paymentProofUrl as proofUrl" class="mt-2">
+                  <a class="btn btn-outline-primary btn-sm" [href]="proofUrl" target="_blank">View Payment Screenshot</a>
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                  <button class="btn btn-success" [disabled]="saving" (click)="verifyPayment('PAID')">
+                    Mark Payment as PAID
+                  </button>
+                  <button class="btn btn-outline-danger" [disabled]="saving" (click)="verifyPayment('UNPAID')">
+                    Mark Payment as UNPAID
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card shadow-sm border-0">
+              <div class="card-body">
+                <h5>Status Update</h5>
+                <div class="row g-2">
+                  <div class="col-md-4">
+                    <label class="form-label">New Status</label>
+                    <select class="form-select" [(ngModel)]="selectedStatus">
+                      <option *ngFor="let status of requestStatuses" [value]="status">{{ status }}</option>
+                    </select>
+                  </div>
+                  <div class="col-md-8">
+                    <label class="form-label">Remarks</label>
+                    <textarea class="form-control" rows="2" [(ngModel)]="statusRemarks"></textarea>
+                  </div>
+                </div>
+                <button class="btn btn-primary mt-3" [disabled]="saving" (click)="updateStatus()">
+                  Update Status
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card shadow-sm border-0">
+              <div class="card-body">
+                <h5>Upload Final Document</h5>
+                <input type="file" class="form-control" (change)="onFinalDocumentSelected($event)" />
+                <button class="btn btn-dark mt-3" [disabled]="saving || !finalDocumentFile" (click)="uploadFinalDocument()">
+                  Upload Final Document
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="modal-backdrop" *ngIf="showDeleteModal">
+        <div class="confirm-modal">
+          <h5>Delete Document?</h5>
+          <p class="text-muted">This action will remove the file from cloud storage and database.</p>
+          <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-outline-secondary" (click)="closeDeleteConfirmation()">Cancel</button>
+            <button class="btn btn-danger" [disabled]="saving" (click)="confirmDeleteDocument()">Delete</button>
+          </div>
+        </div>
+      </div>
+    </section>

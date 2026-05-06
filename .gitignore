@@ -1,0 +1,44 @@
+# Node
+node_modules/
+dist/
+out-tsc/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Angular/Ionic
+.angular/
+.ionic/
+
+# Java
+target/
+*.log
+
+# Android / Capacitor
+customer-app/android/.gradle/
+customer-app/android/.idea/
+customer-app/android/local.properties
+customer-app/android/**/build/
+*.keystore
+*.jks
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
+
+# Env
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Local data
+backend/uploads/
+backend/archives/
+
+# Local overrides
+backend/src/main/resources/application-local.properties
