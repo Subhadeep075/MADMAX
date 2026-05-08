@@ -1,14 +1,14 @@
-# Digital Cyber Seva - Zero Budget Production Runbook
+# Digital Cyber Seva - Production Deployment Runbook
 
-This runbook helps you go live with minimum/zero budget using:
-- Backend + MySQL on one free VM
+This runbook helps you go live with a practical, low-maintenance setup:
+- Backend + MySQL on one VM
 - Admin web + Customer web/PWA on static hosting
 
 ---
 
-## 1) Recommended Stack (Zero Budget)
+## 1) Recommended Stack
 
-1. Backend API (Spring Boot): Oracle Cloud Always Free VM
+1. Backend API (Spring Boot): Oracle Cloud VM
 2. MySQL DB: same VM
 3. Admin web (`admin-web`): Cloudflare Pages
 4. Customer web/PWA (`customer-app`): Cloudflare Pages
@@ -55,11 +55,11 @@ git push origin main
 
 ---
 
-## 4) Backend + MySQL on Free VM
+## 4) Backend + MySQL on VM
 
 ## 4.1 Create VM
 
-- Create Oracle Cloud Always Free VM (Ubuntu)
+- Create an Ubuntu VM
 - Open inbound ports: `22`, `80`, `443`
 
 ## 4.2 Install runtime
@@ -108,7 +108,7 @@ JWT_EXPIRATION_MS=86400000
 # Add your actual admin/customer frontend domains here
 APP_CORS_ADDITIONAL_ORIGIN_PATTERNS=https://<ADMIN_PAGES_DOMAIN>,https://<CUSTOMER_PAGES_DOMAIN>
 
-# Storage options: local (zero cost) or cloudinary
+# Storage options: local or cloudinary
 STORAGE_PROVIDER=local
 STORAGE_FALLBACK_TO_LOCAL=true
 LOCAL_STORAGE_BASE_PATH=/opt/dcs/storage/uploads
@@ -214,7 +214,7 @@ sudo systemctl restart dcs-backend
 
 ---
 
-## 7) Daily Ops (Free Tier Friendly)
+## 7) Daily Ops
 
 1. DB backup once daily
 2. Check logs once daily
@@ -239,4 +239,3 @@ Then:
   - `cd /opt/dcs && git pull`
   - `cd backend && mvn clean package -DskipTests`
   - `sudo systemctl restart dcs-backend`
-

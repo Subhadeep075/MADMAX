@@ -1,57 +1,48 @@
 # Digital Cyber Seva
 
-Full-stack workspace for service request operations with customer and admin flows.
+Digital Cyber Seva is a full-stack platform for service requests, document handling, and manual payment verification.
+It has two separate apps:
+- Customer app (Ionic Angular) for citizens
+- Admin panel (Angular) for operators
 
-## Stack
-- Backend: Java Spring Boot MVC
-- Admin Panel: Angular
-- Customer App: Ionic Angular + Capacitor
+## Tech Stack
+- Backend: Spring Boot (Java 17)
 - Database: MySQL
-- File storage: Cloudinary (replaceable with Firebase Storage later)
+- Admin UI: Angular
+- Customer UI: Ionic Angular + Capacitor (APK + Web/PWA)
+- Auth: JWT
 
-## Auth Rules
-- Customer login: mobile + 4-digit Security PIN
-- Admin login: mobile/email + password
-- Auth: JWT token
+## Authentication Model
+- Customer: mobile number + 4-digit Security PIN
+- Admin: mobile/email + password
 - Roles: `CUSTOMER`, `ADMIN`
-- OTP: **Not used anywhere**
+- OTP is intentionally not used
 
-## Folders
-- `backend` - REST APIs, auth, roles, request workflows
-- `admin-web` - admin management UI scaffold
-- `customer-app` - customer mobile/web UI scaffold
+## Project Structure
+- `backend` - APIs, business logic, security, scheduled jobs
+- `admin-web` - admin dashboard and operations
+- `customer-app` - customer mobile/web experience
 
-## Feature Coverage in Backend APIs
-- Customer service browsing
-- Service request submission
-- Document upload and delete
-- Tracking ID generation
-- Shop UPI QR upload + customer QR display API
-- QR/UPI/Cash manual payment proof upload
-- Admin service management
-- Admin request processing
-- Admin status updates
-- Admin manual payment verification (`PAID` / `UNPAID`)
-- Admin final document upload
+## Core Functional Flows
+- Browse categories and services
+- Create customer request with tracking ID
+- Upload and delete request documents
+- Submit payment proof (UPI ID or screenshot)
+- Admin verifies payment manually
+- Admin updates request status and uploads final document
+- Customer sees status updates and final document
+- Account deletion request with admin approval and delayed cleanup
 
-## Backend API Toolkit
-- API examples: `backend/docs/backend-api-examples.md`
-- Postman collection: `backend/docs/postman/digital-cyber-seva.postman_collection.json`
-- Postman environment: `backend/docs/postman/digital-cyber-seva-local.postman_environment.json`
-- Account deletion Postman runbook: `backend/README.md` (`Postman Quick Test Flow (Account Deletion)` section)
-- Validation/production setup guide: `VALIDATION_AND_PRODUCTION_GUIDE.md`
-- Zero-budget production runbook: `PRODUCTION_ZERO_BUDGET_RUNBOOK.md`
-
-## Quick Start
-1. Start MySQL and create database `digital_cyber_seva`.
-2. Copy and configure environment values:
-   - `backend/.env.example` -> `backend/.env` (or export env vars in shell/hosting platform)
+## Local Setup
+1. Create MySQL database: `digital_cyber_seva`
+2. Copy env template:
+   - `backend/.env.example` -> `backend/.env`
 3. Start backend:
    ```bash
    cd backend
    mvn spring-boot:run
    ```
-4. Start admin panel:
+4. Start admin app:
    ```bash
    cd ../admin-web
    npm install
@@ -64,34 +55,18 @@ Full-stack workspace for service request operations with customer and admin flow
    npm start
    ```
 
-## Before Validation / Production
-1. Never commit secrets in `application.properties`.
-2. Set production values via environment variables:
-   - DB: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`
-   - JWT: `JWT_SECRET`
-   - Storage: `STORAGE_PROVIDER`, `CLOUDINARY_*` (if using Cloudinary)
-   - CORS: `APP_CORS_ADDITIONAL_ORIGIN_PATTERNS`
-3. Keep `STORAGE_PROVIDER=local` for low-cost staging if needed.
-4. Ensure cron cleanup jobs are enabled (already configured by default):
-   - account deletion cleanup
-   - past records archive/cleanup
-5. Build with production configs:
-   - Admin: `cd admin-web && npm run build -- --configuration production`
-   - Customer: `cd customer-app && npm run build -- --configuration production`
-6. Validate full flow for 2-3 days on staging before production cutover.
+## API and Testing References
+- API examples: `backend/docs/backend-api-examples.md`
+- Postman collection: `backend/docs/postman/digital-cyber-seva.postman_collection.json`
+- Postman environment: `backend/docs/postman/digital-cyber-seva-local.postman_environment.json`
+- Account deletion API flow: `backend/README.md`
 
-## GitHub Collaboration Setup
-1. Branch protection checklist:
-   - `.github/BRANCH_PROTECTION_CHECKLIST.md`
-2. Issue templates:
-   - `.github/ISSUE_TEMPLATE/bug_report.yml`
-   - `.github/ISSUE_TEMPLATE/feature_request.yml`
-3. Pull request template:
-   - `.github/pull_request_template.md`
-4. CI workflow:
-   - `.github/workflows/ci.yml`
-   - Runs on `push` and `pull_request` to `main`
-   - Checks:
-     - `backend-build`
-     - `admin-web-build`
-     - `customer-app-build`
+## Deployment and Validation Docs
+- Validation guide: `VALIDATION_AND_PRODUCTION_GUIDE.md`
+- Production deployment runbook: `PRODUCTION_DEPLOYMENT_RUNBOOK.md`
+
+## Team Workflow
+- Branch protection checklist: `.github/BRANCH_PROTECTION_CHECKLIST.md`
+- Issue templates: `.github/ISSUE_TEMPLATE/`
+- PR template: `.github/pull_request_template.md`
+- CI workflow: `.github/workflows/ci.yml`

@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -76,4 +76,3 @@ jobs:
 
       - name: Build customer-app (production)
         run: npx ng build --configuration production --progress=false
-
