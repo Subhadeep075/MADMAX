@@ -40,6 +40,7 @@ Full-stack workspace for service request operations with customer and admin flow
 - Postman environment: `backend/docs/postman/digital-cyber-seva-local.postman_environment.json`
 - Account deletion Postman runbook: `backend/README.md` (`Postman Quick Test Flow (Account Deletion)` section)
 - Validation/production setup guide: `VALIDATION_AND_PRODUCTION_GUIDE.md`
+- Zero-budget production runbook: `PRODUCTION_ZERO_BUDGET_RUNBOOK.md`
 
 ## Quick Start
 1. Start MySQL and create database `digital_cyber_seva`.
